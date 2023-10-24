@@ -1,0 +1,90 @@
+ <!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Your CSS styles can go here */
+    </style>
+</head>
+<body>
+    <h1>Magnesium Calculator</h1>
+
+    <!-- Section 1: Mag Bolus Calculator -->
+    <section>
+        <h2>Mag Bolus Calculator</h2>
+        <form id="bolus-calculator-form">
+            <label for="serum-magnesium">Enter Patient Serum Magnesium Level (Mag):</label>
+            <input type="number" id="serum-magnesium" step="0.01" required><br>
+
+            <label for="patient-bmi">Patient BMI:</label>
+            <select id="patient-bmi">
+                <option value="1">Average</option>
+                <option value="0.75">Low</option>
+            </select><br>
+
+            <p id="bolus-result">Mag Bolus: </p>
+        </form>
+        <button type="button" onclick="calculateMagBolus()">Calculate Mag Bolus</button>
+    </section>
+
+    <!-- Section 2: Mag Run Calculator -->
+    <section>
+        <h2>Mag Run Calculator</h2>
+        <form id="run-calculator-form">
+            <label for="serum-creatinine">Enter Patient Serum Creatinine Level (Cr):</label>
+            <input type="number" id="serum-creatinine" step="0.01" required><br>
+
+            <label>Patient Urine Output (UOP):</label><br>
+            <input type="radio" name="urine-output" value="1.25">Excellent (Cr<1.1 Only)
+            <input type="radio" name="urine-output" value="1">Adequate (1cc/kg/hr)
+            <input type="radio" name="urine-output" value="0.5">Decreased
+            <input type="radio" name="urine-output" value="0">None/Unknown-Concerned<br>
+
+            <label>Patient Cr/UOP Trend:</label><br>
+            <input type="radio" name="urine-trend" value="1">Stable
+            <input type="radio" name="urine-trend" value="0.5">Worsening
+            <input type="radio" name="urine-trend" value="1.25">Improving<br>
+
+            <p id="run-rate-result">Mag Run Rate: </p>
+        </form>
+        <button type="button" onclick="calculateMagRun()">Calculate Mag Run Rate</button>
+    </section>
+
+    <script>
+        function calculateMagBolus() {
+            // Get input values for Mag Bolus
+            const magnesium = parseFloat(document.getElementById("serum-magnesium").value);
+            const patientBMI = parseFloat(document.getElementById("patient-bmi").value);
+
+            // Calculate Mag Bolus
+            let bolusAmount = Math.floor(8 * patientBMI - magnesium);
+            if (patientBMI === 1) {
+                bolusAmount = Math.min(bolusAmount, 6);
+            } else if (patientBMI === 0.75) {
+                bolusAmount = Math.min(bolusAmount, 4);
+            }
+
+            // Display Mag Bolus result
+            document.getElementById("bolus-result").textContent = `Mag Bolus: ${bolusAmount}`;
+        }
+
+        function calculateMagRun() {
+            // Get input values for Mag Run
+            const creatinine = parseFloat(document.getElementById("serum-creatinine").value);
+            const urineOutput = parseFloat(document.querySelector('input[name="urine-output"]:checked').value);
+            const urineTrend = parseFloat(document.querySelector('input[name="urine-trend"]:checked').value);
+
+            // Calculate Mag Run Rate
+            let runRateAmount = (1 / creatinine) * 1.25 * urineTrend * urineOutput;
+
+            // Limit run rate to a maximum of 2.0
+            runRateAmount = Math.min(runRateAmount, 2.0);
+
+            // Round Mag Run Rate to one decimal point
+            runRateAmount = runRateAmount.toFixed(1);
+
+            // Display Mag Run Rate result
+            document.getElementById("run-rate-result").textContent = `Mag Run Rate: ${runRateAmount}`;
+        }
+    </script>
+</body>
+</html>
